@@ -1,157 +1,312 @@
+@import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600&display=swap');
+
 :root {
-    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
-    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
-    font-size: 16px;
-    line-height: 24px;
-    font-weight: 400;
-    color-scheme: light dark;
-    color: rgba(255, 255, 255, 0.87);
-    background-color: rgba(27, 38, 54, 1);
-    font-synthesis: none;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-text-size-adjust: 100%;
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
+  --glass-bg: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.15);
+  --glass-shadow: rgba(0, 0, 0, 0.3);
+  --text-primary: rgba(255, 255, 255, 0.95);
+  --text-secondary: rgba(255, 255, 255, 0.6);
+  --accent: rgba(120, 180, 255, 0.9);
+  --accent-glow: rgba(120, 180, 255, 0.3);
+  --code-bg: rgba(0, 0, 0, 0.3);
+  --success: rgba(100, 220, 150, 0.9);
 }
 
-@font-face {
-    font-family: "Inter";
-    font-style: normal;
-    font-weight: 400;
-    src: local(""),
-    url("./Inter-Medium.ttf") format("truetype");
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-h3 {
-    font-size: 3em;
-    line-height: 1.1;
-}
-
-a {
-    font-weight: 500;
-    color: #646cff;
-    text-decoration: inherit;
-}
-
-a:hover {
-    color: #535bf2;
-}
-
-button {
-    width: 60px;
-    height: 30px;
-    line-height: 30px;
-    border-radius: 3px;
-    border: none;
-    margin: 0 0 0 20px;
-    padding: 0 8px;
-    cursor: pointer;
-}
-
-.result {
-    height: 20px;
-    line-height: 20px;
+html, body {
+  height: 100%;
+  overflow: hidden;
 }
 
 body {
-    margin: 0;
-    display: flex;
-    place-items: center;
-    place-content: center;
-    min-width: 320px;
-    min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+  font-weight: 400;
+  color: var(--text-primary);
+  background: linear-gradient(135deg, #0a0a12 0%, #1a1a2e 50%, #16213e 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 60px;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
-.container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+/* Ambient background glow */
+body::before {
+  content: '';
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: 
+    radial-gradient(circle at 20% 20%, rgba(120, 180, 255, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(180, 120, 255, 0.06) 0%, transparent 40%);
+  pointer-events: none;
+  z-index: -1;
 }
 
-h1 {
-    font-size: 3.2em;
-    line-height: 1.1;
+#root {
+  width: 100%;
+  max-width: 640px;
+  padding: 0 24px;
 }
 
-#app {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 2rem;
-    text-align: center;
+/* Main container */
+.vaul-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
-.logo {
-    height: 6em;
-    padding: 1.5em;
-    will-change: filter;
+/* Header */
+.vaul-header {
+  text-align: center;
+  padding: 20px 0;
 }
 
-.logo:hover {
-    filter: drop-shadow(0 0 2em #e80000aa);
+.vaul-title {
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-.logo.react:hover {
-    filter: drop-shadow(0 0 2em #61dafbaa);
+.vaul-subtitle {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 6px;
+  font-weight: 400;
 }
 
-.result {
-    height: 20px;
-    line-height: 20px;
-    margin: 1.5rem auto;
-    text-align: center;
+/* Glass input container */
+.glass-input-container {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 4px;
+  box-shadow: 
+    0 8px 32px var(--glass-shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
 }
 
-.footer {
-    margin-top: 1rem;
-    align-content: center;
-    text-align: center;
+.glass-input-container:focus-within {
+  border-color: var(--accent);
+  box-shadow: 
+    0 8px 32px var(--glass-shadow),
+    0 0 20px var(--accent-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
-@media (prefers-color-scheme: light) {
-    :root {
-        color: #213547;
-        background-color: #ffffff;
-    }
-
-    a:hover {
-        color: #747bff;
-    }
-
-    button {
-        background-color: #f9f9f9;
-    }
+.command-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 14px;
+  color: var(--text-primary);
+  padding: 14px 16px;
+  caret-color: var(--accent);
 }
 
-
-.input-box .btn:hover {
-    background-image: linear-gradient(to top, #cfd9df 0%, #e2ebf0 100%);
-    color: #333333;
+.command-input::placeholder {
+  color: var(--text-secondary);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
 }
 
-.input-box .input {
-    border: none;
-    border-radius: 3px;
-    outline: none;
-    height: 30px;
-    line-height: 30px;
-    padding: 0 10px;
-    color: black;
-    background-color: rgba(240, 240, 240, 1);
-    -webkit-font-smoothing: antialiased;
+/* Commands list */
+.commands-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: calc(100vh - 280px);
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
-.input-box .input:hover {
-    border: none;
-    background-color: rgba(255, 255, 255, 1);
+.commands-list::-webkit-scrollbar {
+  width: 6px;
 }
 
-.input-box .input:focus {
-    border: none;
-    background-color: rgba(255, 255, 255, 1);
+.commands-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.commands-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+}
+
+.commands-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Command card */
+.command-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.command-card:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.command-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+}
+
+.command-code {
+  flex: 1;
+  background: var(--code-bg);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 13px;
+  color: var(--text-primary);
+  overflow-x: auto;
+  white-space: nowrap;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.command-code::-webkit-scrollbar {
+  height: 4px;
+}
+
+.command-code::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+/* Copy button */
+.copy-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.copy-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.copy-btn:active {
+  transform: scale(0.95);
+}
+
+.copy-btn.copied {
+  background: rgba(100, 220, 150, 0.15);
+  border-color: var(--success);
+}
+
+.copy-btn svg {
+  width: 18px;
+  height: 18px;
+  stroke: var(--text-secondary);
+  transition: stroke 0.2s ease;
+}
+
+.copy-btn:hover svg {
+  stroke: var(--text-primary);
+}
+
+.copy-btn.copied svg {
+  stroke: var(--success);
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text-secondary);
+}
+
+.empty-state-icon {
+  font-size: 40px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-state-text {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Delete button */
+.delete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  opacity: 0;
+}
+
+.command-card:hover .delete-btn {
+  opacity: 1;
+}
+
+.delete-btn:hover {
+  background: rgba(255, 100, 100, 0.15);
+}
+
+.delete-btn svg {
+  width: 16px;
+  height: 16px;
+  stroke: rgba(255, 100, 100, 0.7);
+}
+
+.delete-btn:hover svg {
+  stroke: rgba(255, 100, 100, 1);
 }
