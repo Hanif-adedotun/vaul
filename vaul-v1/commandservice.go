@@ -34,13 +34,13 @@ func (cs *CommandService) initFilePath() {
 	if err != nil {
 		configDir = "."
 	}
-	
+
 	vaulDir := filepath.Join(configDir, "vaul")
 	if err := os.MkdirAll(vaulDir, 0755); err != nil {
 		cs.filePath = "commands.json"
 		return
 	}
-	
+
 	cs.filePath = filepath.Join(vaulDir, "commands.json")
 }
 
@@ -51,7 +51,7 @@ func (cs *CommandService) loadCommands() {
 		cs.commands = []Command{}
 		return
 	}
-	
+
 	if err := json.Unmarshal(data, &cs.commands); err != nil {
 		cs.commands = []Command{}
 	}
@@ -73,13 +73,13 @@ func (cs *CommandService) AddCommand(content string) (Command, error) {
 		Content:   content,
 		CreatedAt: time.Now(),
 	}
-	
+
 	cs.commands = append([]Command{cmd}, cs.commands...)
-	
+
 	if err := cs.saveCommands(); err != nil {
 		return Command{}, err
 	}
-	
+
 	return cmd, nil
 }
 
@@ -104,3 +104,7 @@ func generateID() string {
 	return time.Now().Format("20060102150405.000000000")
 }
 
+// setFilePath sets the file path for testing purposes
+func (cs *CommandService) setFilePath(path string) {
+	cs.filePath = path
+}

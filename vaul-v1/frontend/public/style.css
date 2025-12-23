@@ -57,6 +57,7 @@ body::before {
   width: 100%;
   max-width: 640px;
   padding: 0 24px;
+  overflow: visible;
 }
 
 /* Main container */
@@ -64,6 +65,7 @@ body::before {
   display: flex;
   flex-direction: column;
   gap: 24px;
+  overflow: visible;
 }
 
 /* Header */
@@ -132,10 +134,11 @@ body::before {
 .commands-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
   max-height: calc(100vh - 280px);
   overflow-y: auto;
-  padding-right: 4px;
+  overflow-x: hidden;
+  padding: 12px 12px 12px 4px;
 }
 
 .commands-list::-webkit-scrollbar {
@@ -157,12 +160,13 @@ body::before {
 
 /* Command card */
 .command-card {
+  position: relative;
   background: var(--glass-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--glass-border);
   border-radius: 12px;
-  overflow: hidden;
+  overflow: visible;
   transition: all 0.2s ease;
   animation: slideIn 0.3s ease;
 }
@@ -279,34 +283,40 @@ body::before {
 
 /* Delete button */
 .delete-btn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
-  background: transparent;
-  border: none;
-  border-radius: 8px;
+  width: 24px;
+  height: 24px;
+  background: rgba(60, 60, 70, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
   cursor: pointer;
   transition: all 0.2s ease;
-  flex-shrink: 0;
   opacity: 0;
+  transform: scale(0.8);
+  z-index: 10;
 }
 
 .command-card:hover .delete-btn {
   opacity: 1;
+  transform: scale(1);
 }
 
 .delete-btn:hover {
-  background: rgba(255, 100, 100, 0.15);
+  background: rgba(255, 80, 80, 0.9);
+  border-color: rgba(255, 100, 100, 0.5);
 }
 
 .delete-btn svg {
-  width: 16px;
-  height: 16px;
-  stroke: rgba(255, 100, 100, 0.7);
+  width: 12px;
+  height: 12px;
+  stroke: rgba(255, 255, 255, 0.7);
 }
 
 .delete-btn:hover svg {
-  stroke: rgba(255, 100, 100, 1);
+  stroke: rgba(255, 255, 255, 1);
 }
