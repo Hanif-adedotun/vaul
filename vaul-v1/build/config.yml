@@ -5,12 +5,12 @@ version: '3'
 
 # This information is used to generate the build assets.
 info:
-  companyName: "My Company" # The name of the company
-  productName: "My Product" # The name of the application
-  productIdentifier: "com.mycompany.myproduct" # The unique product identifier
-  description: "A program that does X" # The application description
-  copyright: "(c) 2025, My Company" # Copyright text
-  comments: "Some Product Comments" # Comments
+  companyName: "VAUL" # The name of the company
+  productName: "Vaul" # The name of the application
+  productIdentifier: "com.vaul.app" # The unique product identifier
+  description: "VAUL is an open-source desktop application that helps developers store, organize, and quickly retrieve terminal commands." # The application description
+  copyright: "(c) 2025, VAUL Contributors" # Copyright text
+  comments: "A vault for your terminal commands" # Comments
   version: "0.0.1" # The application version
 
 # iOS build configuration (uncomment to customise iOS project generation)
