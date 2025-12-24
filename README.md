@@ -17,8 +17,8 @@
 
 Pre-built binaries are available for download:
 
-- **macOS**: [`bin/vaul-v1.app`](bin/vaul-v1.app) (macOS application bundle)
-- **Windows**: [`build/windows/nsis/vaul-v1-setup.exe`](build/windows/nsis/vaul-v1-setup.exe) (NSIS installer)
+- **macOS**: [`bin/vaul-v1.app`](vaul-v1/bin/vaul-v1.app) (macOS application bundle)
+- **Windows**: [`build/windows/nsis/vaul-v1-setup.exe`](vaul-v1/build/windows/nsis/vaul-v1-setup.exe) (NSIS installer)
 
 > **Note**: To create downloadable releases, run the build commands below. The built files will be in the locations specified above.
 
