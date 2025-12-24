@@ -13,6 +13,17 @@
 
 ---
 
+## 📥 Downloads
+
+Pre-built binaries are available for download:
+
+- **macOS**: [`bin/vaul-v1.app`](bin/vaul-v1.app) (macOS application bundle)
+- **Windows**: [`build/windows/nsis/vaul-v1-setup.exe`](build/windows/nsis/vaul-v1-setup.exe) (NSIS installer)
+
+> **Note**: To create downloadable releases, run the build commands below. The built files will be in the locations specified above.
+
+---
+
 ## 📖 Overview
 
 **VAUL** is an open-source desktop application that helps developers store, organize, and quickly retrieve terminal commands. It functions as a personal command vault—allowing you to save frequently used or hard-to-remember CLI commands and reuse them efficiently across projects and environments.
@@ -37,6 +48,14 @@ Built for performance and simplicity, VAUL combines a Go backend with a modern R
 - **Go** 1.24 or higher ([Install Go](https://golang.org/doc/install))
 - **Node.js** 18+ and npm ([Install Node.js](https://nodejs.org/))
 - **Wails CLI** v3 ([Install Wails](https://v3alpha.wails.io/quick-start/installation/))
+- **Task** (optional, for using task runner) - Install via:
+  ```bash
+  # macOS
+  brew install go-task/tap/go-task
+  
+  # Or using Go
+  go install github.com/go-task/task/v3/cmd/task@latest
+  ```
 
 ### Installation
 
@@ -73,17 +92,94 @@ wails3 build
 task build
 ```
 
-### Building for Different Platforms
+### Building for Distribution
 
+#### macOS
+
+**Option 1: Using Task (Recommended)**
 ```bash
-# macOS
-task darwin:build
+cd vaul-v1
+task darwin:package
+```
 
-# Windows
-task windows:build
+**Option 2: Using Wails directly**
+```bash
+cd vaul-v1
+# Build the binary
+wails3 build
 
-# Linux
+# Create .app bundle manually
+mkdir -p bin/vaul-v1.app/Contents/{MacOS,Resources}
+cp build/darwin/icons.icns bin/vaul-v1.app/Contents/Resources/
+cp bin/vaul-v1 bin/vaul-v1.app/Contents/MacOS/
+cp build/darwin/Info.plist bin/vaul-v1.app/Contents/
+codesign --force --deep --sign - bin/vaul-v1.app
+```
+
+**Output**: `bin/vaul-v1.app`
+
+To create a distributable `.app` file:
+1. The `.app` bundle will be created in `bin/vaul-v1.app`
+2. You can zip it for distribution: `zip -r vaul-v1-macos.zip bin/vaul-v1.app`
+
+#### Windows
+
+**Option 1: Using Task**
+```bash
+cd vaul-v1
+task windows:create:nsis:installer
+```
+
+**Option 2: Using Wails directly**
+```bash
+cd vaul-v1
+# Build the executable
+wails3 build
+
+# The executable will be in: bin/vaul-v1.exe
+# For installer, you'll need to use NSIS separately
+```
+
+**Output**: 
+- Binary: `bin/vaul-v1.exe`
+- Installer: `build/windows/nsis/vaul-v1-setup.exe` (if using Task)
+
+**Prerequisites for Windows installer**:
+- Install NSIS: `brew install makensis` (macOS) or download from [NSIS website](https://nsis.sourceforge.io/)
+
+#### Linux
+
+**Option 1: Using Task**
+```bash
+cd vaul-v1
 task linux:build
+```
+
+**Option 2: Using Wails directly**
+```bash
+cd vaul-v1
+wails3 build
+```
+
+**Output**: `bin/vaul-v1`
+
+### Quick Build Commands
+
+**Using Task:**
+```bash
+# Build for current platform
+task build
+
+# Package for current platform (creates distributable)
+task package
+```
+
+**Using Wails directly:**
+```bash
+# Build for current platform
+wails3 build
+
+# Output will be in: bin/vaul-v1 (or bin/vaul-v1.exe on Windows)
 ```
 
 ## 📖 Usage
