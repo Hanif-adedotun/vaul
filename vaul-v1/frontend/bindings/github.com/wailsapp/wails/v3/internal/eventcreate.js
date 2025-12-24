@@ -6,4 +6,9 @@
 // @ts-ignore: Unused imports
 import { Create as $Create } from "@wailsio/runtime";
 
-Object.freeze($Create.Events);
+function configure() {
+    Object.freeze(Object.assign($Create.Events, {
+    }));
+}
+
+configure();

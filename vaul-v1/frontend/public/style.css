@@ -25,7 +25,7 @@ html, body {
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
-  font-weight: 400;
+    font-weight: 400;
   color: var(--text-primary);
   background: linear-gradient(135deg, #0a0a12 0%, #1a1a2e 50%, #16213e 100%);
   min-height: 100vh;
@@ -33,9 +33,11 @@ body {
   align-items: flex-start;
   justify-content: center;
   padding-top: 60px;
-  -webkit-font-smoothing: antialiased;
-  user-select: none;
-  -webkit-user-select: none;
+    -webkit-font-smoothing: antialiased;
+    user-select: none;
+    -webkit-user-select: none;
+  border-radius: 20px;
+  overflow: hidden;
 }
 
 /* Ambient background glow */
@@ -88,7 +90,7 @@ body::before {
 .vaul-subtitle {
   font-size: 13px;
   color: var(--text-secondary);
-  font-weight: 400;
+    font-weight: 400;
 }
 
 /* Glass input container */
@@ -151,7 +153,7 @@ body::before {
 
 .commands-list::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.15);
-  border-radius: 3px;
+    border-radius: 3px;
 }
 
 .commands-list::-webkit-scrollbar-thumb:hover {
@@ -189,7 +191,7 @@ body::before {
 }
 
 .command-content {
-  display: flex;
+    display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
@@ -221,9 +223,9 @@ body::before {
 
 /* Copy button */
 .copy-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   width: 36px;
   height: 36px;
   background: rgba(255, 255, 255, 0.06);
@@ -265,7 +267,7 @@ body::before {
 
 /* Empty state */
 .empty-state {
-  text-align: center;
+    text-align: center;
   padding: 48px 24px;
   color: var(--text-secondary);
 }

@@ -45,6 +45,15 @@ export function GetCommands() {
     }));
 }
 
+/**
+ * SetUpdateCallback sets a callback function to be called when commands are updated
+ * @param {$models.UpdateCallback} callback
+ * @returns {$CancellablePromise<void>}
+ */
+export function SetUpdateCallback(callback) {
+    return $Call.ByID(2519273722, callback);
+}
+
 // Private type creation functions
 const $$createType0 = $models.Command.createFrom;
 const $$createType1 = $Create.Array($$createType0);

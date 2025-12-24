@@ -19,6 +19,11 @@ var assets embed.FS
 //go:embed frontend/public/logo.png
 var trayIcon []byte
 
+func init() {
+	// Register events for command changes
+	application.RegisterEvent[string]("commands-updated")
+}
+
 // main function serves as the application's entry point. It initializes the application, creates a window,
 // and starts a goroutine that emits a time-based event every second. It subsequently runs the application and
 // logs any error that might occur.
@@ -46,6 +51,11 @@ func main() {
 		},
 	})
 
+	// Set update callback to emit events when commands change
+	commandService.SetUpdateCallback(func() {
+		app.Event.Emit("commands-updated", "updated")
+	})
+
 	// Create the main window
 	mainWindow := app.Window.NewWithOptions(application.WebviewWindowOptions{
 		Title: "VAUL",
@@ -63,12 +73,14 @@ func main() {
 	})
 
 	// Create tray window (initially hidden)
+	// Min/Max height will be dynamically adjusted based on content
 	trayWindow := app.Window.NewWithOptions(application.WebviewWindowOptions{
 		Title:            "VAUL - Quick Access",
 		Width:            420,
 		Height:           500,
 		MinWidth:         350,
-		MinHeight:        300,
+		MinHeight:        200,
+		MaxHeight:        600,
 		BackgroundColour: application.NewRGB(27, 38, 54),
 		URL:              "/tray.html",
 		Frameless:        true,

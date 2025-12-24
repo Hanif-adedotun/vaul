@@ -1,14 +1,20 @@
 import { useState, useEffect } from 'react'
 import { CommandService } from "../bindings/changeme"
+import { Events } from "@wailsio/runtime"
 
 function App() {
   const [commands, setCommands] = useState([])
   const [inputValue, setInputValue] = useState('')
   const [copiedId, setCopiedId] = useState(null)
 
-  // Load commands on mount
+  // Load commands on mount and set up event listener
   useEffect(() => {
     loadCommands()
+    
+    // Listen for command update events
+    Events.On('commands-updated', () => {
+      loadCommands()
+    })
   }, [])
 
   const loadCommands = async () => {

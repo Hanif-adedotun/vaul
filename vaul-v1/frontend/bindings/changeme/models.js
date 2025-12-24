@@ -54,3 +54,8 @@ export class Command {
         return new Command(/** @type {Partial<Command>} */($$parsedSource));
     }
 }
+
+/**
+ * UpdateCallback is a function type for notifying about command updates
+ * @typedef {any} UpdateCallback
+ */

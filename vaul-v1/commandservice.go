@@ -14,10 +14,26 @@ type Command struct {
 	CreatedAt time.Time `json:"createdAt"`
 }
 
+// UpdateCallback is a function type for notifying about command updates
+type UpdateCallback func()
+
 // CommandService handles storing and retrieving commands
 type CommandService struct {
-	commands []Command
-	filePath string
+	commands       []Command
+	filePath       string
+	updateCallback UpdateCallback
+}
+
+// SetUpdateCallback sets a callback function to be called when commands are updated
+func (cs *CommandService) SetUpdateCallback(callback UpdateCallback) {
+	cs.updateCallback = callback
+}
+
+// emitUpdate calls the update callback if set
+func (cs *CommandService) emitUpdate() {
+	if cs.updateCallback != nil {
+		cs.updateCallback()
+	}
 }
 
 // NewCommandService creates a new CommandService instance
@@ -80,6 +96,7 @@ func (cs *CommandService) AddCommand(content string) (Command, error) {
 		return Command{}, err
 	}
 
+	cs.emitUpdate()
 	return cmd, nil
 }
 
@@ -93,7 +110,11 @@ func (cs *CommandService) DeleteCommand(id string) error {
 	for i, cmd := range cs.commands {
 		if cmd.ID == id {
 			cs.commands = append(cs.commands[:i], cs.commands[i+1:]...)
-			return cs.saveCommands()
+			if err := cs.saveCommands(); err != nil {
+				return err
+			}
+			cs.emitUpdate()
+			return nil
 		}
 	}
 	return nil

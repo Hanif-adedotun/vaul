@@ -1,13 +1,28 @@
 import { useState, useEffect } from 'react'
 import { CommandService } from "../bindings/changeme"
+import { Events } from "@wailsio/runtime"
 
 function TrayApp() {
   const [commands, setCommands] = useState([])
   const [copiedId, setCopiedId] = useState(null)
 
-  // Load commands on mount
+  // Load commands on mount and set up event listener
   useEffect(() => {
     loadCommands()
+    
+    // Listen for command update events
+    Events.On('commands-updated', () => {
+      loadCommands()
+    })
+    
+    // Also poll every 2 seconds as a fallback
+    const pollInterval = setInterval(() => {
+      loadCommands()
+    }, 2000)
+    
+    return () => {
+      clearInterval(pollInterval)
+    }
   }, [])
 
   const loadCommands = async () => {

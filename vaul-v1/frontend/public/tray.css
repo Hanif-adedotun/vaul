@@ -31,15 +31,23 @@ body {
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: 12px;
+  padding: 20px;
   -webkit-font-smoothing: antialiased;
   user-select: none;
   -webkit-user-select: none;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+#root {
+  width: 100%;
+  max-width: 400px;
+  padding: 0 4px;
+  overflow: visible;
 }
 
 .tray-container {
   width: 100%;
-  max-width: 400px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -60,11 +68,11 @@ body {
 .tray-commands-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  max-height: calc(100vh - 120px);
+  gap: 12px;
+  max-height: calc(100vh - 180px);
   overflow-y: auto;
   overflow-x: hidden;
-  padding-right: 4px;
+  padding: 12px 12px 12px 4px;
 }
 
 .tray-commands-list::-webkit-scrollbar {
@@ -85,16 +93,14 @@ body {
 }
 
 .tray-command-item {
+  position: relative;
   background: var(--glass-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--glass-border);
-  border-radius: 8px;
-  padding: 8px 10px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  border-radius: 16px;
+  padding: 12px 14px;
+  padding-right: 40px;
   transition: all 0.2s ease;
   cursor: pointer;
 }
@@ -105,18 +111,24 @@ body {
 }
 
 .tray-command-code {
-  flex: 1;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2.5;
+  overflow: hidden;
+  text-overflow: hidden;
   background: var(--code-bg);
-  border-radius: 6px;
-  padding: 6px 10px;
+  border-radius: 10px;
+  padding: 8px 12px;
   font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
   font-size: 12px;
   color: var(--text-primary);
-  overflow-x: auto;
-  white-space: nowrap;
+  line-height: 1;
+  /* max-height: calc(1.4em * 2 ); */
+  word-break: break-all;
   user-select: text;
   -webkit-user-select: text;
   cursor: pointer;
+  width: 100%;
 }
 
 .tray-command-code::-webkit-scrollbar {
@@ -129,6 +141,9 @@ body {
 }
 
 .tray-copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -136,10 +151,11 @@ body {
   height: 28px;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
   flex-shrink: 0;
+  z-index: 10;
 }
 
 .tray-copy-btn:hover {

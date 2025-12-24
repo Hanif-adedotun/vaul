@@ -10,3 +10,10 @@ export {
 export {
     Command
 } from "./models.js";
+
+import * as $models from "./models.js";
+
+/**
+ * UpdateCallback is a function type for notifying about command updates
+ * @typedef {$models.UpdateCallback} UpdateCallback
+ */
