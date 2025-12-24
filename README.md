@@ -22,6 +22,23 @@ Pre-built binaries are available for download:
 
 > **Note**: To create downloadable releases, run the build commands below. The built files will be in the locations specified above.
 
+### macOS Security Warning
+
+When you first open VAUL on macOS, you may see a warning: *"Apple could not verify vaul-v1 is free of malware"*. This is normal for unsigned applications.
+
+**To open VAUL:**
+
+1. **Right-click** (or Control-click) on `vaul-v1.app`
+2. Select **"Open"** from the context menu
+3. Click **"Open"** in the security dialog that appears
+
+Alternatively:
+1. Go to **System Settings** > **Privacy & Security**
+2. Scroll down to find the blocked app message
+3. Click **"Open Anyway"** next to the VAUL message
+
+> **Note**: This warning appears because VAUL is not code-signed with an Apple Developer certificate. The app is safe to use - you can review the source code to verify. For a signed version, you would need to build it yourself or wait for an official signed release.
+
 ---
 
 ## 📖 Overview
