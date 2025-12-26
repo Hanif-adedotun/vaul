@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { CommandService, WindowService, AppService } from "../bindings/changeme"
 import { Events } from "@wailsio/runtime"
+import Fuse from 'fuse.js'
 
 function TrayApp() {
   const [commands, setCommands] = useState([])
@@ -37,14 +38,20 @@ function TrayApp() {
     }
   }
 
-  // Filter commands based on search query
+  // Fuzzy search filter commands based on search query
   useEffect(() => {
     if (!searchQuery.trim()) {
       setFilteredCommands(commands)
     } else {
-      const filtered = commands.filter(cmd =>
-        cmd.content.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      const fuse = new Fuse(commands, {
+        keys: ['content'],
+        threshold: 0.3, // 0.0 = exact match, 1.0 = match anything
+        includeScore: true,
+        minMatchCharLength: 1,
+      })
+      
+      const results = fuse.search(searchQuery)
+      const filtered = results.map(result => result.item)
       setFilteredCommands(filtered)
     }
   }, [searchQuery, commands])
@@ -77,7 +84,7 @@ function TrayApp() {
 
   return (
     <div className="tray-container">
-      <div className="tray-header-row">
+      <div className="tray-header-section">
         <img src="/logo-full.png" alt="VAUL" className="tray-logo-small" />
         <button className="tray-open-app-btn" onClick={handleOpenMainApp}>
           <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

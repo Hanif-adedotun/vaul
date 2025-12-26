@@ -31,7 +31,7 @@ body {
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: 12px 12px 8px 12px;
+  padding: 12px 12px 4px 12px;
   -webkit-font-smoothing: antialiased;
   user-select: none;
   -webkit-user-select: none;
@@ -55,10 +55,11 @@ body {
   padding-bottom: 0;
 }
 
-.tray-header-row {
+.tray-header-section {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   width: 100%;
 }
 
@@ -71,7 +72,7 @@ body {
 }
 
 .tray-open-app-btn {
-  flex: 0 0 60%;
+  width: 100%;
   padding: 8px 12px;
   background: transparent;
   border: none;
@@ -303,6 +304,7 @@ body {
   border-radius: 6px;
   margin-top: auto;
   margin-bottom: 0;
+  padding-bottom: 4px;
 }
 
 .tray-quit-btn:hover {

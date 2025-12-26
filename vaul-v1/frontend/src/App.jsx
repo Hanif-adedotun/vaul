@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react'
 import { CommandService } from "../bindings/changeme"
 import { Events } from "@wailsio/runtime"
+import Fuse from 'fuse.js'
 
 function App() {
   const [commands, setCommands] = useState([])
+  const [filteredCommands, setFilteredCommands] = useState([])
+  const [searchQuery, setSearchQuery] = useState('')
   const [inputValue, setInputValue] = useState('')
   const [copiedId, setCopiedId] = useState(null)
 
@@ -21,10 +24,29 @@ function App() {
     try {
       const cmds = await CommandService.GetCommands()
       setCommands(cmds || [])
+      setFilteredCommands(cmds || [])
     } catch (err) {
       console.error('Failed to load commands:', err)
     }
   }
+
+  // Fuzzy search filter commands based on search query
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setFilteredCommands(commands)
+    } else {
+      const fuse = new Fuse(commands, {
+        keys: ['content'],
+        threshold: 0.3, // 0.0 = exact match, 1.0 = match anything
+        includeScore: true,
+        minMatchCharLength: 1,
+      })
+      
+      const results = fuse.search(searchQuery)
+      const filtered = results.map(result => result.item)
+      setFilteredCommands(filtered)
+    }
+  }, [searchQuery, commands])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -63,8 +85,24 @@ function App() {
   return (
     <div className="vaul-container">
       <header className="vaul-header">
-        <img src="/logo-full.png" alt="VAUL" className="vaul-logo" />
-        <p className="vaul-subtitle">Your terminal command vault</p>
+        <div className="vaul-header-content">
+          <img src="/logo-full.png" alt="VAUL" className="vaul-logo" />
+          {commands.length > 0 && (
+            <div className="search-container">
+              <svg className="search-icon" viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+              </svg>
+              <input
+                type="text"
+                className="search-input"
+                placeholder="Search commands..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+          )}
+        </div>
       </header>
 
       <form onSubmit={handleSubmit}>
@@ -81,16 +119,19 @@ function App() {
       </form>
 
       <div className="commands-list">
-        {commands.length === 0 ? (
+        {filteredCommands.length === 0 ? (
           <div className="empty-state">
             <div className="empty-state-icon">⌨️</div>
             <p className="empty-state-text">
-              No commands saved yet.<br />
-              Type a command above and press Enter to save it.
+              {searchQuery 
+                ? 'No commands found' 
+                : commands.length === 0 
+                  ? 'No commands saved yet.\nType a command above and press Enter to save it.'
+                  : 'No commands match your search'}
             </p>
           </div>
         ) : (
-          commands.map((cmd) => (
+          filteredCommands.map((cmd) => (
             <div key={cmd.id} className="command-card">
               <button
                 className="delete-btn"
@@ -125,6 +166,17 @@ function App() {
           ))
         )}
       </div>
+
+      {commands.length > 0 && (
+        <footer className="vaul-footer">
+          <span className="command-count">
+            {filteredCommands.length === commands.length 
+              ? `${commands.length} ${commands.length === 1 ? 'command' : 'commands'} stored`
+              : `${filteredCommands.length} of ${commands.length} ${commands.length === 1 ? 'command' : 'commands'}`
+            }
+          </span>
+        </footer>
+      )}
     </div>
   )
 }
