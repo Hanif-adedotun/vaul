@@ -11,6 +11,59 @@ import { Create as $Create } from "@wailsio/runtime";
 import * as time$0 from "../time/models.js";
 
 /**
+ * Category represents a command category
+ */
+export class Category {
+    /**
+     * Creates a new Category instance.
+     * @param {Partial<Category>} [$$source = {}] - The source object to create the Category.
+     */
+    constructor($$source = {}) {
+        if (!("id" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["id"] = "";
+        }
+        if (!("name" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["name"] = "";
+        }
+        if (/** @type {any} */(false)) {
+            /**
+             * Optional hex color
+             * @member
+             * @type {string | undefined}
+             */
+            this["color"] = undefined;
+        }
+        if (!("createdAt" in $$source)) {
+            /**
+             * @member
+             * @type {time$0.Time}
+             */
+            this["createdAt"] = null;
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new Category instance from a string or object.
+     * @param {any} [$$source = {}]
+     * @returns {Category}
+     */
+    static createFrom($$source = {}) {
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        return new Category(/** @type {Partial<Category>} */($$parsedSource));
+    }
+}
+
+/**
  * Command represents a stored terminal command
  */
 export class Command {
@@ -32,6 +85,14 @@ export class Command {
              * @type {string}
              */
             this["content"] = "";
+        }
+        if (/** @type {any} */(false)) {
+            /**
+             * Empty string = uncategorized (backward compatible)
+             * @member
+             * @type {string | undefined}
+             */
+            this["category"] = undefined;
         }
         if (!("createdAt" in $$source)) {
             /**

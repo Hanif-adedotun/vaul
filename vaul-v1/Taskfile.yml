@@ -29,8 +29,15 @@ tasks:
     cmds:
       - task: "{{OS}}:run"
 
+  test:
+    summary: Runs all unit tests
+    cmds:
+      - go test ./... -v
+
   dev:
     summary: Runs the application in development mode
+    deps:
+      - task: test
     cmds:
       - wails3 dev -config ./build/config.yml -port {{.VITE_PORT}}
 

@@ -5,6 +5,7 @@ import Fuse from 'fuse.js'
 
 function TrayApp() {
   const [commands, setCommands] = useState([])
+  const [categories, setCategories] = useState([])
   const [filteredCommands, setFilteredCommands] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
   const [copiedId, setCopiedId] = useState(null)
@@ -30,12 +31,22 @@ function TrayApp() {
 
   const loadCommands = async () => {
     try {
-      const cmds = await CommandService.GetCommands()
+      const [cmds, cats] = await Promise.all([
+        CommandService.GetCommands(),
+        CommandService.GetCategories()
+      ])
       setCommands(cmds || [])
+      setCategories(cats || [])
       setFilteredCommands(cmds || [])
     } catch (err) {
       console.error('Failed to load commands:', err)
     }
+  }
+
+  const getCategoryName = (categoryId) => {
+    if (!categoryId) return null
+    const cat = categories.find(c => c.id === categoryId)
+    return cat ? cat.name : null
   }
 
   // Fuzzy search filter commands based on search query
@@ -115,29 +126,45 @@ function TrayApp() {
             <p>{searchQuery ? 'No commands found' : 'No commands saved'}</p>
           </div>
         ) : (
-          filteredCommands.map((cmd) => (
-            <div key={cmd.id} className="tray-command-item">
-              <code className="tray-command-code" onClick={() => handleCopy(cmd)}>
-                {cmd.content}
-              </code>
-              <button
-                className={`tray-copy-btn ${copiedId === cmd.id ? 'copied' : ''}`}
-                onClick={() => handleCopy(cmd)}
-                title="Copy to clipboard"
-              >
-                {copiedId === cmd.id ? (
-                  <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                  </svg>
-                ) : (
-                  <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                  </svg>
+          filteredCommands.map((cmd) => {
+            const categoryName = getCategoryName(cmd.category)
+            const category = categories.find(c => c.id === cmd.category)
+            
+            return (
+              <div key={cmd.id} className="tray-command-item">
+                {categoryName && (
+                  <div className="tray-command-category">
+                    {category?.color && (
+                      <span 
+                        className="tray-category-dot" 
+                        style={{ backgroundColor: category.color }}
+                      />
+                    )}
+                    <span className="tray-category-name">{categoryName}</span>
+                  </div>
                 )}
-              </button>
-            </div>
-          ))
+                <code className="tray-command-code" onClick={() => handleCopy(cmd)}>
+                  {cmd.content}
+                </code>
+                <button
+                  className={`tray-copy-btn ${copiedId === cmd.id ? 'copied' : ''}`}
+                  onClick={() => handleCopy(cmd)}
+                  title="Copy to clipboard"
+                >
+                  {copiedId === cmd.id ? (
+                    <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  ) : (
+                    <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                  )}
+                </button>
+              </div>
+            )
+          })
         )}
       </div>
 

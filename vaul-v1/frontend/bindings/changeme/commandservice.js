@@ -27,6 +27,40 @@ export function AddCommand(content) {
 }
 
 /**
+ * AddCommandWithCategory adds a new command with a category to storage
+ * @param {string} content
+ * @param {string} category
+ * @returns {$CancellablePromise<$models.Command>}
+ */
+export function AddCommandWithCategory(content, category) {
+    return $Call.ByID(457148008, content, category).then(/** @type {($result: any) => any} */(($result) => {
+        return $$createType0($result);
+    }));
+}
+
+/**
+ * CreateCategory creates a new category
+ * @param {string} name
+ * @param {string} color
+ * @returns {$CancellablePromise<$models.Category>}
+ */
+export function CreateCategory(name, color) {
+    return $Call.ByID(3920645540, name, color).then(/** @type {($result: any) => any} */(($result) => {
+        return $$createType1($result);
+    }));
+}
+
+/**
+ * DeleteCategory deletes a category and optionally reassigns its commands
+ * @param {string} id
+ * @param {string} reassignToCategory
+ * @returns {$CancellablePromise<void>}
+ */
+export function DeleteCategory(id, reassignToCategory) {
+    return $Call.ByID(2228038743, id, reassignToCategory);
+}
+
+/**
  * DeleteCommand removes a command by ID
  * @param {string} id
  * @returns {$CancellablePromise<void>}
@@ -36,13 +70,44 @@ export function DeleteCommand(id) {
 }
 
 /**
+ * GetCategories returns all categories
+ * @returns {$CancellablePromise<$models.Category[]>}
+ */
+export function GetCategories() {
+    return $Call.ByID(1124386808).then(/** @type {($result: any) => any} */(($result) => {
+        return $$createType2($result);
+    }));
+}
+
+/**
  * GetCommands returns all stored commands
  * @returns {$CancellablePromise<$models.Command[]>}
  */
 export function GetCommands() {
     return $Call.ByID(2230805162).then(/** @type {($result: any) => any} */(($result) => {
-        return $$createType1($result);
+        return $$createType3($result);
     }));
+}
+
+/**
+ * GetCommandsByCategory returns commands filtered by category (empty string = uncategorized)
+ * @param {string} categoryID
+ * @returns {$CancellablePromise<$models.Command[]>}
+ */
+export function GetCommandsByCategory(categoryID) {
+    return $Call.ByID(3544855671, categoryID).then(/** @type {($result: any) => any} */(($result) => {
+        return $$createType3($result);
+    }));
+}
+
+/**
+ * MergeCategories merges two categories, moving all commands from source to target
+ * @param {string} sourceID
+ * @param {string} targetID
+ * @returns {$CancellablePromise<void>}
+ */
+export function MergeCategories(sourceID, targetID) {
+    return $Call.ByID(3464509544, sourceID, targetID);
 }
 
 /**
@@ -54,6 +119,29 @@ export function SetUpdateCallback(callback) {
     return $Call.ByID(2519273722, callback);
 }
 
+/**
+ * UpdateCategory updates an existing category
+ * @param {string} id
+ * @param {string} name
+ * @param {string} color
+ * @returns {$CancellablePromise<void>}
+ */
+export function UpdateCategory(id, name, color) {
+    return $Call.ByID(871939973, id, name, color);
+}
+
+/**
+ * UpdateCommandCategory updates the category of an existing command
+ * @param {string} id
+ * @param {string} category
+ * @returns {$CancellablePromise<void>}
+ */
+export function UpdateCommandCategory(id, category) {
+    return $Call.ByID(3448040414, id, category);
+}
+
 // Private type creation functions
 const $$createType0 = $models.Command.createFrom;
-const $$createType1 = $Create.Array($$createType0);
+const $$createType1 = $models.Category.createFrom;
+const $$createType2 = $Create.Array($$createType1);
+const $$createType3 = $Create.Array($$createType0);

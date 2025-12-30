@@ -12,13 +12,61 @@ import (
 func newTestCommandService(t *testing.T) *CommandService {
 	tmpDir := t.TempDir()
 	filePath := filepath.Join(tmpDir, "commands.json")
+	categoriesPath := filepath.Join(tmpDir, "categories.json")
 
 	cs := &CommandService{
-		commands: []Command{},
-		filePath: filePath,
+		commands:       []Command{},
+		categories:     []Category{},
+		filePath:       filePath,
+		categoriesPath: categoriesPath,
 	}
 
 	return cs
+}
+
+// TestCreateCategoryBasic tests basic category creation
+func TestCreateCategoryBasic(t *testing.T) {
+	cs := newTestCommandService(t)
+
+	categoryName := "TestCategory"
+	categoryColor := "#ff0000"
+
+	cat, err := cs.CreateCategory(categoryName, categoryColor)
+	if err != nil {
+		t.Fatalf("CreateCategory() returned error: %v", err)
+	}
+
+	if cat.Name != categoryName {
+		t.Errorf("Expected category name %s, got %s", categoryName, cat.Name)
+	}
+
+	if cat.Color != categoryColor {
+		t.Errorf("Expected category color %s, got %s", categoryColor, cat.Color)
+	}
+
+	if cat.ID == "" {
+		t.Error("Category ID should not be empty")
+	}
+
+	if len(cs.categories) != 1 {
+		t.Errorf("Expected 1 category, got %d", len(cs.categories))
+	}
+}
+
+// TestCreateCategoryEmptyName tests creating category with empty name
+func TestCreateCategoryEmptyName(t *testing.T) {
+	cs := newTestCommandService(t)
+
+	// CreateCategory should handle empty name (though UI should prevent this)
+	cat, err := cs.CreateCategory("", "#ff0000")
+	if err != nil {
+		t.Fatalf("CreateCategory() should not return error for empty name, got: %v", err)
+	}
+
+	// Should still create a category (service doesn't validate)
+	if cat.Name != "" {
+		t.Errorf("Expected empty name, got %s", cat.Name)
+	}
 }
 
 // TestNewCommandService tests the creation of a new CommandService
@@ -340,5 +388,159 @@ func TestSaveCommandsError(t *testing.T) {
 	_, err := cs.AddCommand("test")
 	if err == nil {
 		t.Error("AddCommand() should return error when save fails")
+	}
+}
+
+// TestCreateCategory tests creating a new category
+func TestCreateCategory(t *testing.T) {
+	cs := newTestCommandService(t)
+
+	categoryName := "Git"
+	categoryColor := "#78b4ff"
+	cat, err := cs.CreateCategory(categoryName, categoryColor)
+
+	if err != nil {
+		t.Fatalf("CreateCategory() returned error: %v", err)
+	}
+
+	if cat.Name != categoryName {
+		t.Errorf("Expected category name %s, got %s", categoryName, cat.Name)
+	}
+
+	if cat.Color != categoryColor {
+		t.Errorf("Expected category color %s, got %s", categoryColor, cat.Color)
+	}
+
+	if cat.ID == "" {
+		t.Error("Category ID should not be empty")
+	}
+
+	if cat.CreatedAt.IsZero() {
+		t.Error("CreatedAt should be set")
+	}
+
+	// Verify category was added to the list
+	if len(cs.categories) != 1 {
+		t.Errorf("Expected 1 category, got %d", len(cs.categories))
+	}
+
+	if cs.categories[0].Name != categoryName {
+		t.Errorf("Expected first category name %s, got %s", categoryName, cs.categories[0].Name)
+	}
+
+	// Verify category was saved to file
+	data, err := os.ReadFile(cs.categoriesPath)
+	if err != nil {
+		t.Fatalf("Failed to read saved file: %v", err)
+	}
+
+	var savedCategories []Category
+	if err := json.Unmarshal(data, &savedCategories); err != nil {
+		t.Fatalf("Failed to unmarshal saved categories: %v", err)
+	}
+
+	if len(savedCategories) != 1 {
+		t.Errorf("Expected 1 saved category, got %d", len(savedCategories))
+	}
+
+	if savedCategories[0].Name != categoryName {
+		t.Errorf("Expected saved category name %s, got %s", categoryName, savedCategories[0].Name)
+	}
+}
+
+// TestCreateCategoryDuplicate tests creating a duplicate category (should return existing)
+func TestCreateCategoryDuplicate(t *testing.T) {
+	cs := newTestCommandService(t)
+
+	categoryName := "Git"
+	categoryColor := "#78b4ff"
+
+	cat1, err1 := cs.CreateCategory(categoryName, categoryColor)
+	if err1 != nil {
+		t.Fatalf("CreateCategory() returned error: %v", err1)
+	}
+
+	// Try to create same category again
+	cat2, err2 := cs.CreateCategory(categoryName, "#ff0000")
+	if err2 != nil {
+		t.Fatalf("CreateCategory() returned error: %v", err2)
+	}
+
+	// Should return the same category
+	if cat1.ID != cat2.ID {
+		t.Error("Creating duplicate category should return existing category")
+	}
+
+	// Should still only have one category
+	if len(cs.categories) != 1 {
+		t.Errorf("Expected 1 category, got %d", len(cs.categories))
+	}
+}
+
+// TestGetCategories tests retrieving all categories
+func TestGetCategories(t *testing.T) {
+	cs := newTestCommandService(t)
+
+	// Initially should be empty
+	categories := cs.GetCategories()
+	if len(categories) != 0 {
+		t.Errorf("Expected 0 categories initially, got %d", len(categories))
+	}
+
+	// Add some categories
+	cs.CreateCategory("Git", "#78b4ff")
+	cs.CreateCategory("Docker", "#0db7ed")
+	cs.CreateCategory("npm", "#cb3837")
+
+	// Retrieve categories
+	categories = cs.GetCategories()
+	if len(categories) != 3 {
+		t.Errorf("Expected 3 categories, got %d", len(categories))
+	}
+}
+
+// TestAddCommandWithCategory tests adding a command with a category
+func TestAddCommandWithCategory(t *testing.T) {
+	cs := newTestCommandService(t)
+
+	// Create a category first
+	cat, err := cs.CreateCategory("Git", "#78b4ff")
+	if err != nil {
+		t.Fatalf("CreateCategory() returned error: %v", err)
+	}
+
+	// Add command with category
+	testContent := "git commit -m 'test'"
+	cmd, err := cs.AddCommandWithCategory(testContent, cat.ID)
+
+	if err != nil {
+		t.Fatalf("AddCommandWithCategory() returned error: %v", err)
+	}
+
+	if cmd.Content != testContent {
+		t.Errorf("Expected content %s, got %s", testContent, cmd.Content)
+	}
+
+	if cmd.Category != cat.ID {
+		t.Errorf("Expected category %s, got %s", cat.ID, cmd.Category)
+	}
+
+	// Verify command was saved with category
+	data, err := os.ReadFile(cs.filePath)
+	if err != nil {
+		t.Fatalf("Failed to read saved file: %v", err)
+	}
+
+	var savedCommands []Command
+	if err := json.Unmarshal(data, &savedCommands); err != nil {
+		t.Fatalf("Failed to unmarshal saved commands: %v", err)
+	}
+
+	if len(savedCommands) != 1 {
+		t.Errorf("Expected 1 saved command, got %d", len(savedCommands))
+	}
+
+	if savedCommands[0].Category != cat.ID {
+		t.Errorf("Expected saved command category %s, got %s", cat.ID, savedCommands[0].Category)
 	}
 }

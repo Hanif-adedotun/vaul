@@ -4,6 +4,7 @@ import (
 	"embed"
 	_ "embed"
 	"log"
+	"time"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
 	"github.com/wailsapp/wails/v3/pkg/events"
@@ -112,7 +113,15 @@ func main() {
 			Backdrop:                application.MacBackdropTranslucent,
 			InvisibleTitleBarHeight: 0,
 			TitleBar:                application.MacTitleBarHiddenInset,
+			WindowLevel:             application.MacWindowLevelStatus, // Status level for system tray windows - appears over full screen apps
 		},
+	})
+
+	// Register hook to ensure window appears over full screen apps when shown
+	trayWindow.RegisterHook(events.Common.WindowShow, func(e *application.WindowEvent) {
+		// Force window to front when shown
+		trayWindow.Focus()
+		trayWindow.UnMinimise()
 	})
 
 	// Create the system tray
@@ -142,8 +151,10 @@ func main() {
 
 	trayMenu.Add("Show Commands").OnClick(func(ctx *application.Context) {
 		if trayWindow != nil {
+			// Ensure window appears over full screen apps
 			trayWindow.Show()
 			trayWindow.Focus()
+			trayWindow.UnMinimise()
 		}
 	})
 
@@ -157,6 +168,10 @@ func main() {
 
 	// Attach window to system tray (clicking tray icon toggles window)
 	systray.AttachWindow(trayWindow)
+
+	// Configure window positioning and debounce for better behavior
+	systray.WindowOffset(5)                        // Offset from tray icon
+	systray.WindowDebounce(200 * time.Millisecond) // Debounce clicks to prevent rapid toggling
 
 	// Run the application. This blocks until the application has been exited.
 	err := app.Run()
