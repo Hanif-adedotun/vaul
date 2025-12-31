@@ -94,6 +94,14 @@ export class Command {
              */
             this["category"] = undefined;
         }
+        if (/** @type {any} */(false)) {
+            /**
+             * Optional alias for CLI access
+             * @member
+             * @type {string | undefined}
+             */
+            this["alias"] = undefined;
+        }
         if (!("createdAt" in $$source)) {
             /**
              * @member

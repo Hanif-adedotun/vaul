@@ -39,6 +39,19 @@ export function AddCommandWithCategory(content, category) {
 }
 
 /**
+ * AddCommandWithCategoryAndAlias adds a new command with category and alias
+ * @param {string} content
+ * @param {string} category
+ * @param {string} alias
+ * @returns {$CancellablePromise<$models.Command>}
+ */
+export function AddCommandWithCategoryAndAlias(content, category, alias) {
+    return $Call.ByID(2795166819, content, category, alias).then(/** @type {($result: any) => any} */(($result) => {
+        return $$createType0($result);
+    }));
+}
+
+/**
  * CreateCategory creates a new category
  * @param {string} name
  * @param {string} color
@@ -76,6 +89,17 @@ export function DeleteCommand(id) {
 export function GetCategories() {
     return $Call.ByID(1124386808).then(/** @type {($result: any) => any} */(($result) => {
         return $$createType2($result);
+    }));
+}
+
+/**
+ * GetCommandByAlias retrieves a command by its alias
+ * @param {string} alias
+ * @returns {$CancellablePromise<$models.Command>}
+ */
+export function GetCommandByAlias(alias) {
+    return $Call.ByID(607494344, alias).then(/** @type {($result: any) => any} */(($result) => {
+        return $$createType0($result);
     }));
 }
 
@@ -131,6 +155,18 @@ export function UpdateCategory(id, name, color) {
 }
 
 /**
+ * UpdateCommand updates an existing command's content, category, and alias
+ * @param {string} id
+ * @param {string} content
+ * @param {string} category
+ * @param {string} alias
+ * @returns {$CancellablePromise<void>}
+ */
+export function UpdateCommand(id, content, category, alias) {
+    return $Call.ByID(2942553414, id, content, category, alias);
+}
+
+/**
  * UpdateCommandCategory updates the category of an existing command
  * @param {string} id
  * @param {string} category
@@ -138,6 +174,16 @@ export function UpdateCategory(id, name, color) {
  */
 export function UpdateCommandCategory(id, category) {
     return $Call.ByID(3448040414, id, category);
+}
+
+/**
+ * ValidateAlias checks if an alias is unique (excluding the given command ID)
+ * @param {string} alias
+ * @param {string} excludeID
+ * @returns {$CancellablePromise<boolean>}
+ */
+export function ValidateAlias(alias, excludeID) {
+    return $Call.ByID(3019002602, alias, excludeID);
 }
 
 // Private type creation functions

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { CommandService } from "../bindings/changeme"
+import { CommandService, AppService } from "../bindings/changeme"
 import { Events } from "@wailsio/runtime"
 import Fuse from 'fuse.js'
 import CategorySelector from './components/CategorySelector'
@@ -14,20 +14,36 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('')
   const [activeCategory, setActiveCategory] = useState(null) // null = all, '' = uncategorized, id = specific category
   const [inputValue, setInputValue] = useState('')
+  const [aliasInput, setAliasInput] = useState('') // For alias input
   const [selectedCategory, setSelectedCategory] = useState('') // For new command input
   const [copiedId, setCopiedId] = useState(null)
   const [collapsedCategories, setCollapsedCategories] = useState(new Set())
   const [showCreateCategoryModal, setShowCreateCategoryModal] = useState(false)
+  const [symlinkMessage, setSymlinkMessage] = useState(null)
+  const [isCreatingSymlink, setIsCreatingSymlink] = useState(false)
+  const [symlinkExists, setSymlinkExists] = useState(false)
+  const [editingAlias, setEditingAlias] = useState({}) // Track which command's alias is being edited
 
   // Load commands on mount and set up event listener
   useEffect(() => {
     loadCommands()
+    checkSymlinkExists()
     
     // Listen for command update events
     Events.On('commands-updated', () => {
       loadCommands()
     })
   }, [])
+
+  const checkSymlinkExists = async () => {
+    try {
+      const exists = await AppService.SymlinkExists()
+      setSymlinkExists(exists)
+    } catch (err) {
+      console.error('Failed to check symlink:', err)
+      setSymlinkExists(false)
+    }
+  }
 
   const loadCommands = async () => {
     try {
@@ -67,7 +83,7 @@ function App() {
     // Apply search filter
     if (searchQuery.trim()) {
       const fuse = new Fuse(filtered, {
-        keys: ['content'],
+        keys: ['content', 'alias'],
         threshold: 0.3,
         includeScore: true,
         minMatchCharLength: 1,
@@ -84,19 +100,22 @@ function App() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     const trimmedInput = inputValue.trim()
+    const trimmedAlias = aliasInput.trim()
     
     if (!trimmedInput) return
 
     try {
       if (selectedCategory) {
-        await CommandService.AddCommandWithCategory(trimmedInput, selectedCategory)
+        await CommandService.AddCommandWithCategoryAndAlias(trimmedInput, selectedCategory, trimmedAlias || "")
       } else {
-        await CommandService.AddCommand(trimmedInput)
+        await CommandService.AddCommandWithCategoryAndAlias(trimmedInput, "", trimmedAlias || "")
       }
       setInputValue('')
+      setAliasInput('')
       loadCommands()
     } catch (err) {
       console.error('Failed to add command:', err)
+      alert(err.message || 'Failed to add command')
     }
   }
 
@@ -133,6 +152,36 @@ function App() {
       loadCommands()
     } catch (err) {
       console.error('Failed to delete command:', err)
+    }
+  }
+
+  const handleUpdateAlias = async (id, newAlias) => {
+    try {
+      const cmd = commands.find(c => c.id === id)
+      if (cmd) {
+        await CommandService.UpdateCommand(id, cmd.content, cmd.category || "", newAlias.trim())
+        setEditingAlias({...editingAlias, [id]: false})
+        loadCommands()
+      }
+    } catch (err) {
+      console.error('Failed to update alias:', err)
+      alert(err.message || 'Failed to update alias')
+    }
+  }
+
+  const handleCreateSymlink = async () => {
+    setIsCreatingSymlink(true)
+    setSymlinkMessage(null)
+    try {
+      const message = await AppService.CreateSymlink()
+      setSymlinkMessage({ type: 'success', text: message })
+      setTimeout(() => setSymlinkMessage(null), 10000) // Hide after 10 seconds
+      // Check if symlink was created successfully
+      await checkSymlinkExists()
+    } catch (err) {
+      setSymlinkMessage({ type: 'error', text: err.message || 'Failed to create symlink' })
+    } finally {
+      setIsCreatingSymlink(false)
     }
   }
 
@@ -187,7 +236,28 @@ function App() {
               placeholder="Enter a command and press Enter to save..."
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  handleSubmit(e)
+                }
+              }}
               autoFocus
+            />
+          </div>
+          <div className="glass-input-container">
+            <input
+              type="text"
+              className="command-input"
+              placeholder="Alias (optional)"
+              value={aliasInput}
+              onChange={(e) => setAliasInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  handleSubmit(e)
+                }
+              }}
             />
           </div>
           <CategorySelector
@@ -256,12 +326,57 @@ function App() {
                           </svg>
                         </button>
                         <div className="command-content">
+                          {cmd.alias && !editingAlias[cmd.id] && (
+                            <span 
+                              className="alias-tag"
+                              onClick={() => setEditingAlias({...editingAlias, [cmd.id]: true})}
+                              title="Click to edit alias"
+                            >
+                              <span className="alias-tag-at">@</span>
+                              {cmd.alias}
+                            </span>
+                          )}
+                          {editingAlias[cmd.id] && (
+                            <div className="glass-input-container" style={{ flex: '0 0 auto', minWidth: '100px' }}>
+                              <input
+                                type="text"
+                                className="command-input"
+                                defaultValue={cmd.alias || ""}
+                                placeholder="alias"
+                                onBlur={(e) => {
+                                  handleUpdateAlias(cmd.id, e.target.value)
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    e.target.blur()
+                                  } else if (e.key === 'Escape') {
+                                    setEditingAlias({...editingAlias, [cmd.id]: false})
+                                  }
+                                }}
+                                autoFocus
+                                style={{ fontSize: '12px', padding: '8px 12px' }}
+                              />
+                            </div>
+                          )}
                           <code className="command-code">{cmd.content}</code>
-                          <button
-                            className={`copy-btn ${copiedId === cmd.id ? 'copied' : ''}`}
-                            onClick={() => handleCopy(cmd)}
-                            title="Copy to clipboard"
-                          >
+                          <div className="command-actions">
+                            {!cmd.alias && !editingAlias[cmd.id] && (
+                              <button
+                                className="edit-alias-btn"
+                                onClick={() => setEditingAlias({...editingAlias, [cmd.id]: true})}
+                                title="Add alias"
+                              >
+                                <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
+                              </button>
+                            )}
+                            <button
+                              className={`copy-btn ${copiedId === cmd.id ? 'copied' : ''}`}
+                              onClick={() => handleCopy(cmd)}
+                              title="Copy to clipboard"
+                            >
                             {copiedId === cmd.id ? (
                               <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <polyline points="20 6 9 17 4 12"></polyline>
@@ -272,7 +387,8 @@ function App() {
                                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                               </svg>
                             )}
-                          </button>
+                            </button>
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -284,16 +400,48 @@ function App() {
         )}
       </div>
 
-      {commands.length > 0 && (
-        <footer className="vaul-footer">
-          <span className="command-count">
-            {filteredCommands.length === commands.length 
-              ? `${commands.length} ${commands.length === 1 ? 'command' : 'commands'} stored`
-              : `${filteredCommands.length} of ${commands.length} ${commands.length === 1 ? 'command' : 'commands'}`
-            }
-          </span>
-        </footer>
-      )}
+      <footer className="vaul-footer">
+        <div className="footer-left">
+          {commands.length > 0 && (
+            <span className="command-count">
+              {filteredCommands.length === commands.length 
+                ? `${commands.length} ${commands.length === 1 ? 'command' : 'commands'} stored`
+                : `${filteredCommands.length} of ${commands.length} ${commands.length === 1 ? 'command' : 'commands'}`
+              }
+            </span>
+          )}
+          {commands.some(cmd => cmd.alias) && (
+            <div className="cli-hint">
+              <svg className="cli-hint-icon" viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+              <span className="cli-hint-text">Use <code>vaul &lt;alias&gt;</code> in terminal to run commands</span>
+            </div>
+          )}
+        </div>
+        {!symlinkExists && (
+          <div className="footer-right">
+            <button
+              className="symlink-btn"
+              onClick={handleCreateSymlink}
+              disabled={isCreatingSymlink}
+              title="Create symlink so you can use 'vaul' command from anywhere"
+            >
+              {isCreatingSymlink ? 'Creating...' : '🔗 Setup CLI'}
+            </button>
+          </div>
+        )}
+        {symlinkMessage && (
+          <div className={`symlink-message ${symlinkMessage.type || 'info'}`}>
+            {symlinkMessage.text}
+            <button className="symlink-close" onClick={() => setSymlinkMessage(null)}>×</button>
+          </div>
+        )}
+      </footer>
     </div>
   )
 }

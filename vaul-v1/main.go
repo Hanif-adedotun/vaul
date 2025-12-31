@@ -3,7 +3,11 @@ package main
 import (
 	"embed"
 	_ "embed"
+	"fmt"
 	"log"
+	"os"
+	"os/exec"
+	"runtime"
 	"time"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
@@ -26,11 +30,62 @@ func init() {
 	application.RegisterEvent[string]("commands-updated")
 }
 
+// executeCommand runs the command in the user's default shell
+func executeCommand(command string) error {
+	var cmd *exec.Cmd
+
+	switch runtime.GOOS {
+	case "windows":
+		// On Windows, use cmd.exe
+		cmd = exec.Command("cmd.exe", "/c", command)
+	case "darwin", "linux":
+		// On Unix-like systems, use the user's default shell
+		shell := os.Getenv("SHELL")
+		if shell == "" {
+			shell = "/bin/sh"
+		}
+		// Use -c flag to execute the command
+		cmd = exec.Command(shell, "-c", command)
+	default:
+		return fmt.Errorf("unsupported operating system: %s", runtime.GOOS)
+	}
+
+	// Set up stdin/stdout/stderr to inherit from current process
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	// Execute the command
+	return cmd.Run()
+}
+
 // main function serves as the application's entry point. It initializes the application, creates a window,
 // and starts a goroutine that emits a time-based event every second. It subsequently runs the application and
 // logs any error that might occur.
 func main() {
+	// Check for CLI mode - if arguments provided, run CLI instead of GUI
+	if len(os.Args) > 1 {
+		alias := os.Args[1]
 
+		// Create command service
+		commandService := NewCommandService()
+
+		// Get command by alias
+		cmd, err := commandService.GetCommandByAlias(alias)
+		if err != nil {
+			log.Fatalf("Error: %v\nUse 'vaul' without arguments to open the GUI.", err)
+		}
+
+		// Execute the command
+		if err := executeCommand(cmd.Content); err != nil {
+			log.Fatalf("Error executing command: %v", err)
+		}
+
+		// Exit after executing (CLI mode)
+		os.Exit(0)
+	}
+
+	// GUI Mode - existing code continues...
 	// Create the command service
 	commandService := NewCommandService()
 

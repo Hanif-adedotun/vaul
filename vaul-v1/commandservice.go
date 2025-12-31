@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"time"
@@ -12,6 +13,7 @@ type Command struct {
 	ID        string    `json:"id"`
 	Content   string    `json:"content"`
 	Category  string    `json:"category,omitempty"` // Empty string = uncategorized (backward compatible)
+	Alias     string    `json:"alias,omitempty"`    // Optional alias for CLI access
 	CreatedAt time.Time `json:"createdAt"`
 }
 
@@ -137,10 +139,21 @@ func (cs *CommandService) AddCommand(content string) (Command, error) {
 
 // AddCommandWithCategory adds a new command with a category to storage
 func (cs *CommandService) AddCommandWithCategory(content string, category string) (Command, error) {
+	return cs.AddCommandWithCategoryAndAlias(content, category, "")
+}
+
+// AddCommandWithCategoryAndAlias adds a new command with category and alias
+func (cs *CommandService) AddCommandWithCategoryAndAlias(content string, category string, alias string) (Command, error) {
+	// Validate alias uniqueness if provided
+	if alias != "" && !cs.ValidateAlias(alias, "") {
+		return Command{}, fmt.Errorf("alias '%s' already exists", alias)
+	}
+
 	cmd := Command{
 		ID:        generateID(),
 		Content:   content,
 		Category:  category,
+		Alias:     alias,
 		CreatedAt: time.Now(),
 	}
 
@@ -192,6 +205,52 @@ func (cs *CommandService) UpdateCommandCategory(id string, category string) erro
 		}
 	}
 	return nil
+}
+
+// GetCommandByAlias retrieves a command by its alias
+func (cs *CommandService) GetCommandByAlias(alias string) (Command, error) {
+	for _, cmd := range cs.commands {
+		if cmd.Alias == alias {
+			return cmd, nil
+		}
+	}
+	return Command{}, fmt.Errorf("command with alias '%s' not found", alias)
+}
+
+// UpdateCommand updates an existing command's content, category, and alias
+func (cs *CommandService) UpdateCommand(id string, content string, category string, alias string) error {
+	for i, cmd := range cs.commands {
+		if cmd.ID == id {
+			// Validate alias uniqueness (if provided and not empty, and different from current)
+			if alias != "" && alias != cmd.Alias {
+				if !cs.ValidateAlias(alias, id) {
+					return fmt.Errorf("alias '%s' already exists", alias)
+				}
+			}
+			cs.commands[i].Content = content
+			cs.commands[i].Category = category
+			cs.commands[i].Alias = alias
+			if err := cs.saveCommands(); err != nil {
+				return err
+			}
+			cs.emitUpdate()
+			return nil
+		}
+	}
+	return fmt.Errorf("command with id '%s' not found", id)
+}
+
+// ValidateAlias checks if an alias is unique (excluding the given command ID)
+func (cs *CommandService) ValidateAlias(alias string, excludeID string) bool {
+	if alias == "" {
+		return true // Empty alias is always valid
+	}
+	for _, cmd := range cs.commands {
+		if cmd.Alias == alias && cmd.ID != excludeID {
+			return false
+		}
+	}
+	return true
 }
 
 // GetCategories returns all categories

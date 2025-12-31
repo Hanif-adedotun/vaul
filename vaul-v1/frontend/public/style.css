@@ -19,14 +19,15 @@
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   overflow: hidden;
 }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
-    font-weight: 400;
+  font-weight: 400;
   color: var(--text-primary);
   background: linear-gradient(135deg, #0a0a12 0%, #1a1a2e 50%, #16213e 100%);
   min-height: 100vh;
@@ -34,9 +35,9 @@ body {
   align-items: flex-start;
   justify-content: center;
   padding-top: 60px;
-    -webkit-font-smoothing: antialiased;
-    user-select: none;
-    -webkit-user-select: none;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  -webkit-user-select: none;
   border-radius: 20px;
   overflow: hidden;
 }
@@ -49,7 +50,7 @@ body::before {
   left: -50%;
   width: 200%;
   height: 200%;
-  background: 
+  background:
     radial-gradient(circle at 20% 20%, rgba(120, 180, 255, 0.08) 0%, transparent 40%),
     radial-gradient(circle at 80% 80%, rgba(180, 120, 255, 0.06) 0%, transparent 40%);
   pointer-events: none;
@@ -60,7 +61,10 @@ body::before {
   width: 100%;
   max-width: 640px;
   padding: 0 24px;
-  overflow: visible;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 /* Main container */
@@ -68,9 +72,10 @@ body::before {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  overflow: visible;
   height: 100%;
-  min-height: 100vh;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 /* Header */
@@ -78,6 +83,8 @@ body::before {
   padding: 16px 0;
   border-bottom: 1px solid var(--glass-border);
   margin-bottom: 20px;
+  flex-shrink: 0;
+  /* Prevent header from shrinking */
 }
 
 .vaul-header-content {
@@ -104,7 +111,7 @@ body::before {
   border: 1px solid var(--glass-border);
   border-radius: 16px;
   padding: 4px;
-  box-shadow: 
+  box-shadow:
     0 8px 32px var(--glass-shadow),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
   transition: all 0.3s ease;
@@ -112,7 +119,7 @@ body::before {
 
 .glass-input-container:focus-within {
   border-color: var(--accent);
-  box-shadow: 
+  box-shadow:
     0 8px 32px var(--glass-shadow),
     0 0 20px var(--accent-glow),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -168,14 +175,14 @@ body::before {
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
   transition: all 0.3s ease;
   outline: none;
-  box-shadow: 
+  box-shadow:
     0 2px 8px var(--glass-shadow),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .search-input:focus {
   border-color: var(--accent);
-  box-shadow: 
+  box-shadow:
     0 2px 8px var(--glass-shadow),
     0 0 12px var(--accent-glow),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -190,11 +197,12 @@ body::before {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  max-height: calc(100vh - 320px);
   overflow-y: auto;
   overflow-x: hidden;
   padding: 8px 12px 8px 4px;
   flex: 1;
+  min-height: 0;
+  /* Important for flex scrolling */
 }
 
 .commands-list::-webkit-scrollbar {
@@ -207,7 +215,7 @@ body::before {
 
 .commands-list::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.15);
-    border-radius: 3px;
+  border-radius: 3px;
 }
 
 .commands-list::-webkit-scrollbar-thumb:hover {
@@ -227,11 +235,102 @@ body::before {
   animation: slideIn 0.3s ease;
 }
 
+/* Command alias tag and editing */
+.alias-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 100;
+  order: -1;
+  margin-right: 10px;
+  white-space: nowrap;
+}
+
+.alias-tag:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+.alias-tag-at {
+  color: var(--text-primary);
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+
+/* Command actions container */
+.command-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.edit-alias-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.edit-alias-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.edit-alias-btn:active {
+  transform: scale(0.95);
+}
+
+.edit-alias-btn svg {
+  width: 18px;
+  height: 18px;
+  stroke: var(--text-secondary);
+  transition: stroke 0.2s ease;
+}
+
+.edit-alias-btn:hover svg {
+  stroke: var(--text-primary);
+}
+
+.edit-alias-btn.copied {
+  background: rgba(100, 220, 150, 0.15);
+  border-color: var(--success);
+}
+
+.edit-alias-btn.copied svg {
+  stroke: var(--success);
+}
+
 @keyframes slideIn {
   from {
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -245,15 +344,16 @@ body::before {
 }
 
 .command-content {
-    display: flex;
+  display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
   padding: 12px 14px;
+  position: relative;
 }
 
 .command-code {
   flex: 1;
+  min-width: 0;
   background: var(--code-bg);
   border-radius: 8px;
   padding: 10px 14px;
@@ -264,6 +364,8 @@ body::before {
   white-space: nowrap;
   user-select: text;
   -webkit-user-select: text;
+  position: relative;
+  z-index: 1;
 }
 
 .command-code::-webkit-scrollbar {
@@ -277,9 +379,9 @@ body::before {
 
 /* Copy button */
 .copy-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 36px;
   height: 36px;
   background: rgba(255, 255, 255, 0.06);
@@ -321,7 +423,7 @@ body::before {
 
 /* Empty state */
 .empty-state {
-    text-align: center;
+  text-align: center;
   padding: 48px 24px;
   color: var(--text-secondary);
 }
@@ -380,6 +482,8 @@ body::before {
 /* Command input form */
 .command-input-form {
   margin-bottom: 0;
+  flex-shrink: 0;
+  /* Prevent form from shrinking */
 }
 
 .command-input-row {
@@ -394,6 +498,47 @@ body::before {
   align-items: center;
 }
 
+.command-input-row .glass-input-container:last-of-type {
+  flex: 0 0 140px;
+}
+
+.toggle-alias-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.toggle-alias-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.toggle-alias-btn:active {
+  transform: scale(0.95);
+}
+
+.toggle-alias-btn svg {
+  width: 18px;
+  height: 18px;
+  stroke: var(--text-secondary);
+  transition: stroke 0.2s ease;
+}
+
+.toggle-alias-btn:hover svg {
+  stroke: var(--text-primary);
+}
+
+
 /* Category Pills */
 .category-pills {
   display: flex;
@@ -401,6 +546,8 @@ body::before {
   gap: 8px;
   padding: 12px 0;
   margin-bottom: 8px;
+  flex-shrink: 0;
+  /* Prevent category pills from shrinking */
 }
 
 .category-pill {
@@ -587,7 +734,7 @@ body::before {
   width: 100%;
   padding: 10px 12px;
   background: transparent;
-    border: none;
+  border: none;
   border-radius: 6px;
   color: var(--text-primary);
   font-size: 13px;
@@ -639,7 +786,7 @@ body::before {
   border-radius: 6px;
   color: var(--text-primary);
   font-size: 12px;
-    outline: none;
+  outline: none;
 }
 
 .category-selector-create-btn,
@@ -650,7 +797,7 @@ body::before {
   width: 24px;
   height: 24px;
   background: transparent;
-    border: none;
+  border: none;
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -825,9 +972,44 @@ body::before {
   padding: 12px 0;
   border-top: 1px solid var(--glass-border);
   margin-top: auto;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: start;
+  position: relative;
+  flex-shrink: 0;
+  min-height: fit-content;
+}
+
+.footer-left {
+  grid-column: 1;
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.footer-right {
+  grid-column: 2;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  justify-content: flex-end;
+}
+
+/* When footer-right is hidden, footer-left should span full width */
+.vaul-footer:not(:has(.footer-right)) {
+  grid-template-columns: 1fr;
+}
+
+.vaul-footer:not(:has(.footer-right)) .footer-left {
+  grid-column: 1 / -1;
+}
+
+.symlink-message {
+  grid-column: 1 / -1;
 }
 
 .command-count {
@@ -835,6 +1017,135 @@ body::before {
   color: var(--text-secondary);
   font-weight: 400;
   opacity: 0.7;
+}
+
+.cli-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: rgba(100, 220, 150, 0.08);
+  border: 1px solid rgba(100, 220, 150, 0.2);
+  border-radius: 6px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  opacity: 0.9;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.cli-hint-icon {
+  width: 14px;
+  height: 14px;
+  stroke: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.cli-hint-text {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cli-hint code {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+  font-size: 10px;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.symlink-btn {
+  padding: 6px 12px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.symlink-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.symlink-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.symlink-message {
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  line-height: 1.4;
+  white-space: pre-line;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 4px;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.symlink-message.success {
+  background: rgba(100, 220, 150, 0.15);
+  border: 1px solid rgba(100, 220, 150, 0.3);
+  color: rgba(100, 220, 150, 0.95);
+}
+
+.symlink-message.error {
+  background: rgba(255, 100, 100, 0.15);
+  border: 1px solid rgba(255, 100, 100, 0.3);
+  color: rgba(255, 180, 180, 0.95);
+}
+
+.symlink-message.info {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+}
+
+.symlink-close {
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.symlink-close:hover {
+  opacity: 1;
 }
 
 /* Category Pills */
@@ -893,7 +1204,7 @@ body::before {
   width: 32px;
   height: 32px;
   background: transparent;
-    border: none;
+  border: none;
   border-radius: 6px;
   color: var(--text-secondary);
   cursor: pointer;
