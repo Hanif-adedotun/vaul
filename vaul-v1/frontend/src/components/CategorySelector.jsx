@@ -1,24 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
-import { CommandService } from "../../bindings/changeme"
 
-function CategorySelector({ value, onChange }) {
-  const [categories, setCategories] = useState([])
+function CategorySelector({ value, onChange, categories = [] }) {
   const [isOpen, setIsOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const dropdownRef = useRef(null)
-
-  useEffect(() => {
-    loadCategories()
-  }, [])
-
-  const loadCategories = async () => {
-    try {
-      const cats = await CommandService.GetCategories()
-      setCategories(cats || [])
-    } catch (err) {
-      console.error('Failed to load categories:', err)
-    }
-  }
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -56,12 +41,12 @@ function CategorySelector({ value, onChange }) {
         onClick={() => setIsOpen(!isOpen)}
       >
         <span className="category-selector-text">{displayText}</span>
-        <svg 
+        <svg
           className={`category-selector-arrow ${isOpen ? 'open' : ''}`}
-          viewBox="0 0 24 24" 
-          fill="none" 
-          strokeWidth="2" 
-          strokeLinecap="round" 
+          viewBox="0 0 24 24"
+          fill="none"
+          strokeWidth="2"
+          strokeLinecap="round"
           strokeLinejoin="round"
         >
           <polyline points="6 9 12 15 18 9"></polyline>
@@ -99,8 +84,8 @@ function CategorySelector({ value, onChange }) {
                 onClick={() => handleSelect(cat.id)}
               >
                 {cat.color && (
-                  <span 
-                    className="category-color-dot" 
+                  <span
+                    className="category-color-dot"
                     style={{ backgroundColor: cat.color }}
                   />
                 )}

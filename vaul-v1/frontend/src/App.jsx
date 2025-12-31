@@ -28,7 +28,7 @@ function App() {
   useEffect(() => {
     loadCommands()
     checkSymlinkExists()
-    
+
     // Listen for command update events
     Events.On('commands-updated', () => {
       loadCommands()
@@ -88,7 +88,7 @@ function App() {
         includeScore: true,
         minMatchCharLength: 1,
       })
-      
+
       const results = fuse.search(searchQuery)
       filtered = results.map(result => result.item)
     }
@@ -101,7 +101,7 @@ function App() {
     e.preventDefault()
     const trimmedInput = inputValue.trim()
     const trimmedAlias = aliasInput.trim()
-    
+
     if (!trimmedInput) return
 
     try {
@@ -160,7 +160,7 @@ function App() {
       const cmd = commands.find(c => c.id === id)
       if (cmd) {
         await CommandService.UpdateCommand(id, cmd.content, cmd.category || "", newAlias.trim())
-        setEditingAlias({...editingAlias, [id]: false})
+        setEditingAlias({ ...editingAlias, [id]: false })
         loadCommands()
       }
     } catch (err) {
@@ -182,6 +182,23 @@ function App() {
       setSymlinkMessage({ type: 'error', text: err.message || 'Failed to create symlink' })
     } finally {
       setIsCreatingSymlink(false)
+    }
+  }
+
+  const handleDeleteCategory = async (id) => {
+    console.log('handleDeleteCategory called for id:', id)
+    try {
+      // Reassign to uncategorized ("")
+      console.log('Calling CommandService.DeleteCategory')
+      await CommandService.DeleteCategory(id, "")
+      console.log('DeleteCategory success')
+      if (activeCategory === id) {
+        setActiveCategory(null)
+      }
+      loadCommands()
+    } catch (err) {
+      console.error('Failed to delete category:', err)
+      alert(err.message || 'Failed to delete category')
     }
   }
 
@@ -209,10 +226,13 @@ function App() {
       </header>
 
       {commands.length > 0 && (
-        <CategoryPills 
+        <CategoryPills
           activeCategory={activeCategory}
           onCategoryChange={setActiveCategory}
           onManageCategories={() => setShowCreateCategoryModal(true)}
+          categories={categories}
+          commands={commands}
+          onDeleteCategory={handleDeleteCategory}
         />
       )}
 
@@ -249,6 +269,7 @@ function App() {
             <input
               type="text"
               className="command-input"
+              style={{ width: "180px" }}
               placeholder="Alias (optional)"
               value={aliasInput}
               onChange={(e) => setAliasInput(e.target.value)}
@@ -263,6 +284,7 @@ function App() {
           <CategorySelector
             value={selectedCategory}
             onChange={setSelectedCategory}
+            categories={categories}
           />
         </div>
       </form>
@@ -272,9 +294,9 @@ function App() {
           <div className="empty-state">
             <div className="empty-state-icon">⌨️</div>
             <p className="empty-state-text">
-              {searchQuery 
-                ? 'No commands found' 
-                : commands.length === 0 
+              {searchQuery
+                ? 'No commands found'
+                : commands.length === 0
                   ? 'No commands saved yet.\nType a command above and press Enter to save it.'
                   : 'No commands match your search'}
             </p>
@@ -291,19 +313,19 @@ function App() {
                   className="category-header"
                   onClick={() => toggleCategory(categoryId)}
                 >
-                  <svg 
+                  <svg
                     className={`category-chevron ${isCollapsed ? 'collapsed' : ''}`}
-                    viewBox="0 0 24 24" 
-                    fill="none" 
-                    strokeWidth="2" 
-                    strokeLinecap="round" 
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    strokeWidth="2"
+                    strokeLinecap="round"
                     strokeLinejoin="round"
                   >
                     <polyline points="6 9 12 15 18 9"></polyline>
                   </svg>
                   {category?.color && (
-                    <span 
-                      className="category-header-color" 
+                    <span
+                      className="category-header-color"
                       style={{ backgroundColor: category.color }}
                     />
                   )}
@@ -327,9 +349,9 @@ function App() {
                         </button>
                         <div className="command-content">
                           {cmd.alias && !editingAlias[cmd.id] && (
-                            <span 
+                            <span
                               className="alias-tag"
-                              onClick={() => setEditingAlias({...editingAlias, [cmd.id]: true})}
+                              onClick={() => setEditingAlias({ ...editingAlias, [cmd.id]: true })}
                               title="Click to edit alias"
                             >
                               <span className="alias-tag-at">@</span>
@@ -350,7 +372,7 @@ function App() {
                                   if (e.key === 'Enter') {
                                     e.target.blur()
                                   } else if (e.key === 'Escape') {
-                                    setEditingAlias({...editingAlias, [cmd.id]: false})
+                                    setEditingAlias({ ...editingAlias, [cmd.id]: false })
                                   }
                                 }}
                                 autoFocus
@@ -363,7 +385,7 @@ function App() {
                             {!cmd.alias && !editingAlias[cmd.id] && (
                               <button
                                 className="edit-alias-btn"
-                                onClick={() => setEditingAlias({...editingAlias, [cmd.id]: true})}
+                                onClick={() => setEditingAlias({ ...editingAlias, [cmd.id]: true })}
                                 title="Add alias"
                               >
                                 <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -377,16 +399,16 @@ function App() {
                               onClick={() => handleCopy(cmd)}
                               title="Copy to clipboard"
                             >
-                            {copiedId === cmd.id ? (
-                              <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <polyline points="20 6 9 17 4 12"></polyline>
-                              </svg>
-                            ) : (
-                              <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                              </svg>
-                            )}
+                              {copiedId === cmd.id ? (
+                                <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                              ) : (
+                                <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg>
+                              )}
                             </button>
                           </div>
                         </div>
@@ -404,7 +426,7 @@ function App() {
         <div className="footer-left">
           {commands.length > 0 && (
             <span className="command-count">
-              {filteredCommands.length === commands.length 
+              {filteredCommands.length === commands.length
                 ? `${commands.length} ${commands.length === 1 ? 'command' : 'commands'} stored`
                 : `${filteredCommands.length} of ${commands.length} ${commands.length === 1 ? 'command' : 'commands'}`
               }

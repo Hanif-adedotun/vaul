@@ -1,64 +1,69 @@
-import { useState, useEffect } from 'react'
-import { CommandService } from "../../bindings/changeme"
+import { useMemo } from 'react'
 
-function CategoryPills({ activeCategory, onCategoryChange, onManageCategories }) {
-  const [categories, setCategories] = useState([])
-  const [commandCounts, setCommandCounts] = useState({})
+function CategoryPills({ activeCategory, onCategoryChange, onManageCategories, categories = [], commands = [], onDeleteCategory }) {
 
-  useEffect(() => {
-    loadData()
-  }, [])
-
-  const loadData = async () => {
-    try {
-      const [cats, commands] = await Promise.all([
-        CommandService.GetCategories(),
-        CommandService.GetCommands()
-      ])
-      
-      setCategories(cats || [])
-      
-      // Count commands per category
-      const counts = { '': 0 }
+  const commandCounts = useMemo(() => {
+    const counts = { '': 0 }
+    if (Array.isArray(commands)) {
       commands.forEach(cmd => {
         const catId = cmd.category || ''
         counts[catId] = (counts[catId] || 0) + 1
       })
-      setCommandCounts(counts)
-    } catch (err) {
-      console.error('Failed to load categories:', err)
     }
-  }
+    return counts
+  }, [commands])
 
   const handleCategoryClick = (categoryId) => {
     onCategoryChange(categoryId === activeCategory ? null : categoryId)
+  }
+
+  const handleDelete = (e, id) => {
+    e.stopPropagation()
+    console.log('Delete button clicked for id:', id)
+    onDeleteCategory(id)
   }
 
   const allCount = Object.values(commandCounts).reduce((sum, count) => sum + count, 0)
 
   return (
     <div className="category-pills">
-      <button
+      <div
         className={`category-pill ${activeCategory === null ? 'active' : ''}`}
         onClick={() => handleCategoryClick(null)}
+        role="button"
+        tabIndex={0}
       >
         <span className="category-pill-name">All</span>
         {allCount > 0 && (
           <span className="category-pill-count">{allCount}</span>
         )}
-      </button>
+      </div>
 
       {categories.map((cat) => {
         const count = commandCounts[cat.id] || 0
         return (
-          <button
+          <div
             key={cat.id}
             className={`category-pill ${activeCategory === cat.id ? 'active' : ''}`}
             onClick={() => handleCategoryClick(cat.id)}
+            role="button"
+            tabIndex={0}
           >
+            {onDeleteCategory && (
+              <button
+                className="delete-btn"
+                onClick={(e) => handleDelete(e, cat.id)}
+                title="Delete category"
+              >
+                <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            )}
             {cat.color && (
-              <span 
-                className="category-pill-color" 
+              <span
+                className="category-pill-color"
                 style={{ backgroundColor: cat.color }}
               />
             )}
@@ -66,7 +71,7 @@ function CategoryPills({ activeCategory, onCategoryChange, onManageCategories })
             {count > 0 && (
               <span className="category-pill-count">{count}</span>
             )}
-          </button>
+          </div>
         )
       })}
 

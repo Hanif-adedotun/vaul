@@ -2,7 +2,7 @@
 
 <div align="center">
 
-**A beautiful, native desktop application for storing and quickly accessing your terminal commands**
+**A native desktop application for storing and quickly accessing your terminal commands**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Go Version](https://img.shields.io/badge/Go-1.24+-00ADD8?logo=go)](https://golang.org/)
@@ -40,6 +40,16 @@ Alternatively:
 > **Note**: This warning appears because VAUL is not code-signed with an Apple Developer certificate. The app is safe to use - you can review the source code to verify. For a signed version, you would need to build it yourself or wait for an official signed release.
 
 ---
+
+</p>
+<p align="center">
+	<img src="preview.png" alt="OpenScreen App Preview" style="height: 320px; margin-right: 12px;" />
+	<img src="preview2.png" alt="OpenScreen App Preview 2" style="height: 320px; margin-right: 12px;" />
+	<img src="preview3.png" alt="OpenScreen App Preview 3" style="height: 320px; margin-right: 12px;" />
+	<img src="preview4.png" alt="OpenScreen App Preview 4" style="height: 320px; margin-right: 12px;" />
+	
+</p>
+</p>
 
 ## 📖 Overview
 
