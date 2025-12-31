@@ -42,12 +42,8 @@ Alternatively:
 ---
 
 </p>
-<p align="center">
-	<img src="preview.png" alt="OpenScreen App Preview" style="height: 320px; margin-right: 12px;" />
-	<img src="preview2.png" alt="OpenScreen App Preview 2" style="height: 320px; margin-right: 12px;" />
-	<img src="preview3.png" alt="OpenScreen App Preview 3" style="height: 320px; margin-right: 12px;" />
-	<img src="preview4.png" alt="OpenScreen App Preview 4" style="height: 320px; margin-right: 12px;" />
-	
+<p align="center" style=" width: full; margin: 0 auto;">
+	<img src="preview3.jpg" alt="OpenScreen App Preview 3" style="height: 320px; margin-right: 12px; border-radius: 9px;" />
 </p>
 </p>
 
