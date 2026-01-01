@@ -162,13 +162,12 @@ func main() {
 		BackgroundColour: application.NewRGB(27, 38, 54),
 		URL:              "/tray.html",
 		Frameless:        true,
-		AlwaysOnTop:      true,
 		Hidden:           true,
 		Mac: application.MacWindow{
 			Backdrop:                application.MacBackdropTranslucent,
 			InvisibleTitleBarHeight: 0,
 			TitleBar:                application.MacTitleBarHiddenInset,
-			WindowLevel:             application.MacWindowLevelStatus, // Status level for system tray windows - appears over full screen apps
+			WindowLevel:             application.MacWindowLevelPopUpMenu, // Appear over full screen apps
 		},
 	})
 
