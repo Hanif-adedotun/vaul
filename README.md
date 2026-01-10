@@ -2,6 +2,7 @@
 
 <div align="center">
 
+	
 **A native desktop application for storing and quickly accessing your terminal commands**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -10,6 +11,12 @@
 [![React](https://img.shields.io/badge/React-18.2+-61DAFB?logo=react)](https://reactjs.org/)
 
 </div>
+
+</p>
+<p align="center" style=" width: full; margin: 0 auto;">
+	<img src="preview3.jpg" alt="OpenScreen App Preview 3" style="height: 450px; margin-right: 12px; border-radius: 9px;" />
+</p>
+</p>
 
 ---
 
@@ -41,11 +48,7 @@ Alternatively:
 
 ---
 
-</p>
-<p align="center" style=" width: full; margin: 0 auto;">
-	<img src="preview3.jpg" alt="OpenScreen App Preview 3" style="height: 320px; margin-right: 12px; border-radius: 9px;" />
-</p>
-</p>
+
 
 ## 📖 Overview
 
