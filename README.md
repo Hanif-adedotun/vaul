@@ -1,7 +1,8 @@
-# VAUL
+
 
 <div align="center">
 
+<h1>VAUL</h1>
 	
 **A native desktop application for storing and quickly accessing your terminal commands**
 
