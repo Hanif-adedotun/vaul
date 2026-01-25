@@ -305,7 +305,7 @@ export const RetrievingCommand: React.FC = () => {
 					style={{
 						display: 'flex',
 						flexDirection: 'column',
-						gap: '16px',
+						gap: '8px',
 						overflowY: 'auto',
 						flex: 1,
 						minHeight: 0,
@@ -313,7 +313,7 @@ export const RetrievingCommand: React.FC = () => {
 					}}
 				>
 					{/* Git Category */}
-					<div style={{marginBottom: '8px'}}>
+					<div style={{marginBottom: '4px'}}>
 						{/* Category Header */}
 						<button
 							style={{
@@ -527,7 +527,7 @@ export const RetrievingCommand: React.FC = () => {
 					</div>
 
 					{/* Docker Category */}
-					<div style={{marginBottom: '8px'}}>
+					<div style={{marginBottom: '4px'}}>
 						<button
 							style={{
 								display: 'flex',
