@@ -225,7 +225,7 @@ export const TerminalQuestion: React.FC = () => {
 						lineHeight: '1.3',
 					}}
 				>
-					Do you find it difficult to search for long terminal commands?
+					Tired of forgetting terminal commands?
 				</div>
 			</AbsoluteFill>
 		</AbsoluteFill>

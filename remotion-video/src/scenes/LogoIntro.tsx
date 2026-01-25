@@ -56,7 +56,7 @@ export const LogoIntro: React.FC = () => {
 	const logoSlideOutX = interpolate(
 		frame,
 		[logoStartFrame, logoSlideOutEnd],
-		[0, 500], // Slides to the right
+		[0, 300], // Slides to the right
 		{
 			easing: Easing.out(Easing.ease),
 			extrapolateLeft: 'clamp',
@@ -68,7 +68,7 @@ export const LogoIntro: React.FC = () => {
 	const logoSlideOutScale = interpolate(
 		frame,
 		[logoStartFrame, logoSlideOutEnd],
-		[0.4, 0.8], // Bigger when sliding out
+		[0.7, 1], // Bigger when sliding out
 		{
 			easing: Easing.out(Easing.ease),
 			extrapolateLeft: 'clamp',
@@ -94,7 +94,7 @@ export const LogoIntro: React.FC = () => {
 	const logoSlideBackX = interpolate(
 		frame,
 		[logoSlideBackStart, logoSlideBackEnd],
-		[500, 0], // Slides back to center
+		[300, 0], // Slides back to center
 		{
 			easing: Easing.inOut(Easing.ease),
 			extrapolateLeft: 'clamp',
@@ -108,7 +108,7 @@ export const LogoIntro: React.FC = () => {
 	const logoFinalScale = interpolate(
 		frame,
 		[logoSlideBackStart, logoSlideBackEnd],
-		[0.8, 1], // Scales to final size
+		[1, 1], // Scales to final size
 		{
 			easing: Easing.out(Easing.ease),
 			extrapolateLeft: 'clamp',
@@ -308,7 +308,7 @@ export const LogoIntro: React.FC = () => {
 					zIndex: 50,
 				}}
 			>
-				Introducing Vaul
+				Meet Vaul
 			</div>
 
 			{/* Tagline */}
@@ -327,7 +327,7 @@ export const LogoIntro: React.FC = () => {
 					zIndex: 50,
 				}}
 			>
-				A vault for your terminal commands
+				Your terminal commands, always at your fingertips
 			</div>
 		</AbsoluteFill>
 	);
