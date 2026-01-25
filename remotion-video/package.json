@@ -1,0 +1,23 @@
+{
+  "name": "vaul-promo-video",
+  "version": "1.0.0",
+  "description": "Promotional video for VAUL using Remotion",
+  "scripts": {
+    "dev": "remotion studio",
+    "build": "remotion render VaulPromo out/video.mp4",
+    "render": "remotion render"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.200",
+    "@remotion/bundler": "^4.0.200",
+    "remotion": "^4.0.200",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "typescript": "^5.0.0"
+  }
+}
+
